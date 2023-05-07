@@ -15,6 +15,7 @@ const REWARDS_TOKEN_ACCOUNT = "acc://accumulated.acme/staking-rewards"
 const TREASURY_TOKEN_ACCOUNT = "acc://accumulated.acme/treasury"
 const LIQUID_STAKING_TOKEN_ACCOUNT = "acc://accumulated.acme/staking"
 const INCENTIVES_TOKEN_ACCOUNT = "acc://accumulated.acme/incentives"
+const PEG_PROTECTION_TOKEN_ACCOUNT = "acc://accumulated.acme/peg-protection"
 const WACME_LP_INCENTIVES_TOKEN_ACCOUNT = "acc://accumulated.acme/wacme-lp-incentives"
 
 type Output struct {
@@ -72,7 +73,7 @@ func main() {
 		Share: 1200,
 	})
 	outputs.Items = append(outputs.Items, &Output{
-		URL:   INCENTIVES_TOKEN_ACCOUNT,
+		URL:   PEG_PROTECTION_TOKEN_ACCOUNT,
 		Share: 800,
 	})
 	outputs.Items = append(outputs.Items, &Output{
