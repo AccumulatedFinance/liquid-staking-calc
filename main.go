@@ -8,15 +8,21 @@ import (
 	"strconv"
 
 	"github.com/AccumulatedFinance/liquid-staking-calc/accumulate"
+	"github.com/AccumulatedFinance/liquid-staking-calc/accumulated"
 )
 
-const API_URL = "https://mainnet.accumulatenetwork.io/v2"
+const ACCUMULATED_FINANCE_API_URL = "https://api.accumulated.finance/v1"
+
+const ACCUMULATE_API_URL = "https://mainnet.accumulatenetwork.io/v2"
 const REWARDS_TOKEN_ACCOUNT = "acc://accumulated.acme/staking-rewards"
 const TREASURY_TOKEN_ACCOUNT = "acc://accumulated.acme/treasury"
 const LIQUID_STAKING_TOKEN_ACCOUNT = "acc://accumulated.acme/staking"
 const INCENTIVES_TOKEN_ACCOUNT = "acc://accumulated.acme/incentives"
 const PEG_PROTECTION_TOKEN_ACCOUNT = "acc://accumulated.acme/peg-protection"
 const WACME_LP_INCENTIVES_TOKEN_ACCOUNT = "acc://accumulated.acme/wacme-lp-incentives"
+
+const STACME_ETHEREUM = "0x7AC168c81F4F3820Fa3F22603ce5864D6aB3C547"
+const STACME_ARBITRUM = "0x7AC168c81F4F3820Fa3F22603ce5864D6aB3C547"
 
 type Output struct {
 	URL          string `json:"url"`
@@ -64,6 +70,32 @@ func (o *Output) String() string {
 
 func main() {
 
+	// get stACME total supply on Ethereum & Arbitrum
+	acfiClient := accumulated.NewAccumulatedFinanceClient(ACCUMULATED_FINANCE_API_URL, 5)
+
+	stacme1, err := acfiClient.GetToken(1, STACME_ETHEREUM)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("stACME Ethereum total supply:", stacme1.TotalSupply)
+
+	stacme42161, err := acfiClient.GetToken(42161, STACME_ARBITRUM)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("stACME Arbitrum total supply:", stacme42161.TotalSupply)
+
+	var share1 float64
+	var share42161 float64
+
+	share1 = float64(stacme1.TotalSupply) / (float64(stacme1.TotalSupply) + float64(stacme42161.TotalSupply))
+	share42161 = float64(stacme42161.TotalSupply) / (float64(stacme1.TotalSupply) + float64(stacme42161.TotalSupply))
+
+	fmt.Println("stACME Ethereum share:", share1)
+	fmt.Println("stACME Arbitrum share:", share42161)
+
 	// set distribution for liquid staking rewards
 	// https://docs.accumulated.finance/accumulated-finance/fees
 	// share is in bps (1% = 100)
@@ -78,7 +110,11 @@ func main() {
 	})
 	outputs.Items = append(outputs.Items, &Output{
 		URL:   LIQUID_STAKING_TOKEN_ACCOUNT,
-		Share: 8000,
+		Share: int(8000 * share1),
+	})
+	outputs.Items = append(outputs.Items, &Output{
+		URL:   LIQUID_STAKING_TOKEN_ACCOUNT,
+		Share: 8000 - int(8000*share1),
 	})
 
 	// validate shares
@@ -112,7 +148,7 @@ func main() {
 		log.Fatal("Expected total shares: ", 10000, ", received: ", totalShare_wacme)
 	}
 
-	client := accumulate.NewAccumulateClient(API_URL, 5)
+	client := accumulate.NewAccumulateClient(ACCUMULATE_API_URL, 5)
 
 	// liquid staking calculator
 	fmt.Println("Calculating liquid staking rewards...")
