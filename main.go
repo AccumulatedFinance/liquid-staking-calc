@@ -129,24 +129,28 @@ func main() {
 	// set distribution for wacme lp incentives
 	// https://docs.accumulated.finance/accumulated-finance/fees
 	// share is in bps (1% = 100)
-	outputs_wacme := &Outputs{}
-	outputs_wacme.Items = append(outputs_wacme.Items, &Output{
-		URL:   TREASURY_TOKEN_ACCOUNT,
-		Share: 800,
-	})
-	outputs_wacme.Items = append(outputs_wacme.Items, &Output{
-		URL:   INCENTIVES_TOKEN_ACCOUNT,
-		Share: 9200,
-	})
+	/*
+		outputs_wacme := &Outputs{}
+		outputs_wacme.Items = append(outputs_wacme.Items, &Output{
+			URL:   TREASURY_TOKEN_ACCOUNT,
+			Share: 800,
+		})
+		outputs_wacme.Items = append(outputs_wacme.Items, &Output{
+			URL:   INCENTIVES_TOKEN_ACCOUNT,
+			Share: 9200,
+		})
+	*/
 
 	// validate shares
-	var totalShare_wacme int
-	for _, item := range outputs_wacme.Items {
-		totalShare_wacme += item.Share
-	}
-	if totalShare_wacme != 10000 {
-		log.Fatal("Expected total shares: ", 10000, ", received: ", totalShare_wacme)
-	}
+	/*
+		var totalShare_wacme int
+		for _, item := range outputs_wacme.Items {
+			totalShare_wacme += item.Share
+		}
+		if totalShare_wacme != 10000 {
+			log.Fatal("Expected total shares: ", 10000, ", received: ", totalShare_wacme)
+		}
+	*/
 
 	client := accumulate.NewAccumulateClient(ACCUMULATE_API_URL, 5)
 
@@ -178,38 +182,41 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("{ type: sendTokens, to: %v }", string(jsonPayload))
+	fmt.Printf("'{ type: sendTokens, to: %v }'", string(jsonPayload))
 	fmt.Println("")
 
 	// wacme lp incentives calculator
-	fmt.Println("Calculating WACME LP incentives...")
-	fmt.Println("Getting account balance:", WACME_LP_INCENTIVES_TOKEN_ACCOUNT)
+	// removed due to change in WACME/frxETH Curve incentives mechanism
+	/*
+		fmt.Println("Calculating WACME LP incentives...")
+		fmt.Println("Getting account balance:", WACME_LP_INCENTIVES_TOKEN_ACCOUNT)
 
-	tokenAccount, err = client.QueryTokenAccount(&accumulate.Params{URL: WACME_LP_INCENTIVES_TOKEN_ACCOUNT})
-	if err != nil {
-		log.Fatal(err)
-	}
+		tokenAccount, err = client.QueryTokenAccount(&accumulate.Params{URL: WACME_LP_INCENTIVES_TOKEN_ACCOUNT})
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	balance = &Balance{}
-	balance.FromString(tokenAccount.Data.Balance)
+		balance = &Balance{}
+		balance.FromString(tokenAccount.Data.Balance)
 
-	fmt.Println("Balance:", balance.Human(), "ACME")
+		fmt.Println("Balance:", balance.Human(), "ACME")
 
-	for _, item := range outputs_wacme.Items {
+		for _, item := range outputs_wacme.Items {
 
-		item.FromBalance(balance)
-		fmt.Println(item)
+			item.FromBalance(balance)
+			fmt.Println(item)
 
-	}
+		}
 
-	fmt.Println("Generating CLI params...")
+		fmt.Println("Generating CLI params...")
 
-	jsonPayload, err = json.Marshal(outputs_wacme.Items)
-	if err != nil {
-		log.Fatal(err)
-	}
+		jsonPayload, err = json.Marshal(outputs_wacme.Items)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	fmt.Printf("{ type: sendTokens, to: %v }", string(jsonPayload))
-	fmt.Println("")
+		fmt.Printf("'{ type: sendTokens, to: %v }'", string(jsonPayload))
+		fmt.Println("")
+	*/
 
 }
